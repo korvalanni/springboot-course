@@ -115,6 +115,9 @@ public class HelloControllerTest {
                 "/updateArrayList", String.format("Строка %s добавлена в список", expected));
 
         List<String> strings = helloController.showArrayList().getBody();
+        if (strings == null || strings.isEmpty())
+            Assertions.fail("The returned list is null or empty.");
+
         String result = strings.get(strings.size() - 1);
 
         Assertions.assertEquals(expected, result);
@@ -131,6 +134,9 @@ public class HelloControllerTest {
         String key = "testString";
         int expected = 1;
         Map<String, Integer> stringFrequency = helloController.showHashMap().getBody();
+        if (stringFrequency == null)
+            Assertions.fail("The returned map is null.");
+
         if (stringFrequency.containsKey(key))
             expected = stringFrequency.get(key) + 1;
 
@@ -156,8 +162,8 @@ public class HelloControllerTest {
      * Параметризированный тест для проверки длины ArrayList и HashMap после их заполнения.
      * Ожидается, что длина каждой коллекции соответствует заданной.
      *
-     * @param arrayLength   ожидаемая длина ArrayList
-     * @param hashMapLength ожидаемая длина HashMap
+     * @param expectedArrayLength   ожидаемая длина ArrayList
+     * @param expectedHashMapLength ожидаемая длина HashMap
      * @author korvalanni
      */
     @ParameterizedTest
@@ -168,10 +174,7 @@ public class HelloControllerTest {
             "2, 1",
             "2, 2"
     })
-    public void testShowAllLength(int arrayLength, int hashMapLength) {
-        int expectedArrayLength = arrayLength;
-        int expectedHashMapLength = hashMapLength;
-
+    public void testShowAllLength(int expectedArrayLength, int expectedHashMapLength) {
         for (int i = 0; i < expectedArrayLength; i++) {
             runDSLWithParamCheck("string", "test",
                     "/updateArrayList", "Строка test добавлена в список");
@@ -182,11 +185,16 @@ public class HelloControllerTest {
                     "/updateHashMap", String.format("Строка %s добавлена в словарь", "test" + i));
         }
 
-        int resultArrayLength = helloController.showArrayList().getBody().size();
-        int resultHashMapLength = helloController.showHashMap().getBody().size();
+        List<String> strings = helloController.showArrayList().getBody();
+        Map<String, Integer> stringsFrequency = helloController.showHashMap().getBody();
+        if(strings == null || stringsFrequency == null)
+            Assertions.fail("The returned map is null.");
+
+        int resultArrayLength = strings.size();
+        int resultHashMapLength = stringsFrequency.size();
 
         runDSLWithoutParamCheck("showAllLength",
-                String.format("Словарь содержит %d элементов, \n список содержит %d элементов",
-                resultHashMapLength, resultArrayLength));
+                String.format("Словарь содержит %d элементов, список содержит %d элементов",
+                        resultHashMapLength, resultArrayLength));
     }
 }

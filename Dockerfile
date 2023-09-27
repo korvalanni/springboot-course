@@ -4,6 +4,7 @@
 FROM maven:3.8.5-openjdk-17-slim AS build
 COPY src /home/app/src
 COPY pom.xml /home/app
+RUN mvn clean install
 RUN mvn -B package -e -X --file /home/app/pom.xml
 
 #

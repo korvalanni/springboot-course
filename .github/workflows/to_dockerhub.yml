@@ -28,13 +28,11 @@ jobs:
           # context: .
           # platforms: linux/arm64/v8
           push: true
-          tags: korvalanni/habit_tracker:latest
-          # cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/habit-tracker:buildcache
-          # cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/habit-tracker:buildcache,mode=max
+          tags: korvalanni/springboot-course:latest
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: korvalanni/cash-server:latest
+          image-ref: korvalanni/springboot-course:latest
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true

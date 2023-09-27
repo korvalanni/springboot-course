@@ -115,6 +115,7 @@ public class HelloControllerTest {
                 "/updateArrayList", String.format("Строка %s добавлена в список", expected));
 
         List<String> strings = helloController.showArrayList().getBody();
+        //Есть подозрение, что тут плохо написано
         if (strings == null || strings.isEmpty())
             Assertions.fail("The returned list is null or empty.");
 
@@ -134,6 +135,7 @@ public class HelloControllerTest {
         String key = "testString";
         int expected = 1;
         Map<String, Integer> stringFrequency = helloController.showHashMap().getBody();
+        //Есть подозрение, что тут плохо написано
         if (stringFrequency == null)
             Assertions.fail("The returned map is null.");
 
@@ -187,6 +189,7 @@ public class HelloControllerTest {
 
         List<String> strings = helloController.showArrayList().getBody();
         Map<String, Integer> stringsFrequency = helloController.showHashMap().getBody();
+       //Есть подозрение, что тут плохо написано
         if(strings == null || stringsFrequency == null)
             Assertions.fail("The returned map is null.");
 

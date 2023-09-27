@@ -19,6 +19,7 @@ import java.util.Map;
 @RestController
 public class HelloController {
 
+    //Есть подозрение, что решение не то, которое ожидалось
     private final List<String> strings;
     private final Map<String, Integer> stringsFrequency;
 

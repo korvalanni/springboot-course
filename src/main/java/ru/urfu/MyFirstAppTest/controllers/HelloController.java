@@ -19,14 +19,13 @@ import java.util.Map;
 @RestController
 public class HelloController {
 
-    //Есть подозрение, что решение не то, которое ожидалось
     private final List<String> strings;
     private final Map<String, Integer> stringsFrequency;
 
     @Autowired
-    public HelloController(List<String> strings, Map<String, Integer> stringsFrequency) {
-        this.strings = new ArrayList<>(strings);
-        this.stringsFrequency = new HashMap<>(stringsFrequency);
+    public HelloController() {
+        this.strings = new ArrayList<>();
+        this.stringsFrequency = new HashMap<>();
     }
     /**
      * Метод HelloWorld

@@ -23,9 +23,9 @@ public class HelloController {
     private final Map<String, Integer> stringsFrequency;
 
     @Autowired
-    public HelloController(List<String> strings, Map<String, Integer> stringsFrequency) {
-        this.strings = new ArrayList<>(strings);
-        this.stringsFrequency = new HashMap<>(stringsFrequency);
+    public HelloController() {
+        this.strings = new ArrayList<>();
+        this.stringsFrequency = new HashMap<>();
     }
     /**
      * Метод HelloWorld

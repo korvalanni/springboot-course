@@ -1,6 +1,5 @@
 package ru.urfu.MyFirstAppTest;
 
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -23,9 +22,7 @@ import ru.urfu.MyFirstAppTest.controllers.HelloController;
 
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
@@ -34,7 +31,7 @@ import static org.hamcrest.CoreMatchers.is;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @AutoConfigureMockMvc
-public class HelloControllerTest {
+class HelloControllerTest {
 
     @LocalServerPort
     private int port;
@@ -45,9 +42,12 @@ public class HelloControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         RestAssured.baseURI = "http://localhost";
         RestAssured.port = port;
     }
@@ -110,11 +110,15 @@ public class HelloControllerTest {
                 .andReturn();
     }
 
-    private <T> T parseResponse(MvcResult mvcResult, Class<T> responseType) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        JavaType javaType = objectMapper.getTypeFactory().constructType(responseType);
-        return objectMapper.readValue(mvcResult.getResponse().getContentAsString(), javaType);
+    private <T extends Collection<?>> T parseResponseAsCollection(MvcResult mvcResult, Class<T> responseType) throws IOException {
+        return objectMapper.readValue(mvcResult.getResponse().getContentAsString(), responseType);
     }
+
+    private <T extends Map<?, ?>> T parseResponseAsMap(MvcResult mvcResult, Class<T> responseType) throws IOException {
+        return objectMapper.readValue(mvcResult.getResponse().getContentAsString(), responseType);
+    }
+
+
 
     /**
      * Тестирование ответа "/hello" без указания параметра.
@@ -123,7 +127,7 @@ public class HelloControllerTest {
      * @author korvalanni
      */
     @Test
-    public void testHelloWithNoParameter() {
+    void testHelloWithNoParameter() {
         String expected = "Hello world";
 
         executeHttpGetRequestWithResponseCheck(ApiConstants.HELLO, expected);
@@ -136,7 +140,7 @@ public class HelloControllerTest {
      * @author korvalanni
      */
     @Test
-    public void testHelloWithParameter() {
+    void testHelloWithParameter() {
         String name = "John";
         String expected = "Hello " + name;
 
@@ -150,9 +154,9 @@ public class HelloControllerTest {
      * @author korvalanni
      */
     @Test
-    public void testUpdateArrayList() throws Exception {
+    void testUpdateArrayList() throws Exception {
         MvcResult mvcResultBeforeUpdate = performGetRequest(ApiConstants.SHOW_ARRAYLIST);
-        List<String> stringsBeforeUpdate = parseResponse(mvcResultBeforeUpdate, List.class);
+        List<String> stringsBeforeUpdate = parseResponseAsCollection(mvcResultBeforeUpdate, List.class);
         Assertions.assertTrue(stringsBeforeUpdate.isEmpty());
 
         String expected = "testString";
@@ -161,7 +165,7 @@ public class HelloControllerTest {
         executeHttpGetRequestWithResponseCheck("string", expected,
                 ApiConstants.UPDATE_ARRAYLIST, successMessage);
         MvcResult mvcResult = performGetRequest(ApiConstants.SHOW_ARRAYLIST);
-        List<String> stringsFromResponse = parseResponse(mvcResult, List.class);
+        List<String> stringsFromResponse = parseResponseAsCollection(mvcResult, List.class);
 
 
         Assertions.assertNotNull(stringsFromResponse);
@@ -176,18 +180,18 @@ public class HelloControllerTest {
      * @author korvalanni
      */
     @Test
-    public void testUpdateHashMap() throws Exception {
+    void testUpdateHashMap() throws Exception {
         String key = "testString";
         String successMessage = String.format("Строка %s добавлена в словарь", key);
 
 
         MvcResult mvcResultBeforeUpdate = performGetRequest(ApiConstants.SHOW_HASHMAP);
-        Map<String, Integer> stringFrequencyBeforeUpdate = parseResponse(mvcResultBeforeUpdate, Map.class);
+        Map<String, Integer> stringFrequencyBeforeUpdate = parseResponseAsMap(mvcResultBeforeUpdate, Map.class);
         Assertions.assertTrue(stringFrequencyBeforeUpdate.isEmpty());
 
         executeHttpGetRequestWithResponseCheck("string", key, ApiConstants.UPDATE_HASHMAP, successMessage);
         MvcResult mvcResultAfterUpdate = performGetRequest(ApiConstants.SHOW_HASHMAP);
-        Map<String, Integer> stringFrequencyAfterUpdate = parseResponse(mvcResultAfterUpdate, Map.class);
+        Map<String, Integer> stringFrequencyAfterUpdate = parseResponseAsMap(mvcResultAfterUpdate, Map.class);
 
         Assertions.assertTrue(stringFrequencyAfterUpdate.containsKey(key));
     }
@@ -199,7 +203,7 @@ public class HelloControllerTest {
      * @author korvalanni
      */
     @Test
-    public void testShowEmptyHashMap() {
+    void testShowEmptyHashMap() {
         executeHttpGetRequestWithResponseCheck("/showHashMap", "{}");
     }
 
@@ -219,7 +223,7 @@ public class HelloControllerTest {
             "2, 1",
             "2, 2"
     })
-    public void testShowAllLength(int expectedArrayLength, int expectedHashMapLength) throws Exception {
+    void testShowAllLength(int expectedArrayLength, int expectedHashMapLength) throws Exception {
         for (int i = 0; i < expectedArrayLength; i++) {
             executeHttpGetRequestWithResponseCheck("string", "test",
                     ApiConstants.UPDATE_ARRAYLIST, "Строка test добавлена в список");
@@ -231,10 +235,10 @@ public class HelloControllerTest {
         }
 
         MvcResult arrayListResult = performGetRequest(ApiConstants.SHOW_ARRAYLIST);
-        List<String> strings = parseResponse(arrayListResult, List.class);
+        List<String> strings = parseResponseAsCollection(arrayListResult, List.class);
 
         MvcResult hashMapResult = performGetRequest(ApiConstants.SHOW_HASHMAP);
-        HashMap<String, Integer> stringsFrequency = parseResponse(hashMapResult, HashMap.class);
+        HashMap<String, Integer> stringsFrequency = parseResponseAsMap(hashMapResult, HashMap.class);
 
         Assertions.assertNotNull(strings);
         Assertions.assertNotNull(stringsFrequency);

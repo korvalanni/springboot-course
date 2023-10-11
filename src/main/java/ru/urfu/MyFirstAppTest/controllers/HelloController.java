@@ -1,13 +1,11 @@
 package ru.urfu.MyFirstAppTest.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,16 +15,13 @@ import java.util.Map;
  * @author Николай Александрович и korvalanni
  */
 @RestController
+@AllArgsConstructor
 public class HelloController {
 
     private final List<String> strings;
     private final Map<String, Integer> stringsFrequency;
 
-    @Autowired
-    public HelloController() {
-        this.strings = new ArrayList<>();
-        this.stringsFrequency = new HashMap<>();
-    }
+
     /**
      * Метод HelloWorld
      *
@@ -97,7 +92,7 @@ public class HelloController {
      * @author korvalanni
      */
     @GetMapping("showAllLength")
-    public ResponseEntity<String > showAllLength() {
+    public ResponseEntity<String> showAllLength() {
         return ResponseEntity.ok(String.format("Словарь содержит %d элементов, список содержит %d элементов",
                 stringsFrequency.size(), strings.size()));
     }
